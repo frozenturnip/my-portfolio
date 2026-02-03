@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type MotionProps } from "framer-motion";
 
 interface AnimatedGradientMeshProps {
   className?: string;
@@ -23,8 +23,8 @@ const LavaBlob = ({
   width: string;
   height: string;
   style: React.CSSProperties;
-  animate: object;
-  transition: object;
+  animate: MotionProps["animate"];
+  transition: MotionProps["transition"];
 }) => (
   <motion.div
     className="absolute"
