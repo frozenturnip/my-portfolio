@@ -33,8 +33,8 @@ const LavaBlob = ({
       height,
       ...style,
     }}
-    animate={animate}
-    transition={transition}
+    animate={animate as MotionProps["animate"]}
+    transition={transition as MotionProps["transition"]}
   >
     {/* Main blob body with glossy gradient */}
     <div
