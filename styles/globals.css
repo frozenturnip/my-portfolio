@@ -1,0 +1,270 @@
+@import "tailwindcss";
+
+/* === Custom Theme Variables for Light & Dark Modes === */
+:root {
+  --color-background: #f5eedc; /* creamy beige */
+  --color-text: #2b2b2b;       /* charcoal */
+  --color-primary: #1d4732;    /* forest green */
+  --color-accent: #e9c46a;     /* golden yellow */
+  --color-sage: #dae2da;
+}
+
+.dark {
+  --color-background: #0b132b; /* deep navy */
+  --color-text: #eaeaea;       /* light text */
+  --color-primary: #1e2a47;    /* indigo support */
+  --color-accent: #f5c76a;     /* gold */
+  --color-sage: #b3c3d3;
+  /* Dark mode specific colors for Tailwind */
+  --color-darkbg: #0b132b;
+  --color-darktext: #eaeaea;
+  --color-darkprimary: #1e2a47;
+  --color-darkaccent: #f5c76a;
+  --color-darkmuted: #6b7280;
+}
+
+/* === Global Styles === */
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  transition:
+    background-color 0.5s ease,
+    color 0.5s ease;
+}
+
+/* Smooth link transitions */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--color-accent);
+}
+
+/* Optional: subtle fade animations for dark/light transitions */
+html {
+  scroll-behavior: smooth;
+  transition: background-color 0.6s ease, color 0.6s ease;
+}
+/* === Fix 3D card flipping === */
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+[backface-visibility\:hidden] {
+  backface-visibility: hidden;
+}
+/* === Card Flip 3D Support === */
+.flip-card {
+  perspective: 1000px;
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.8s ease;
+}
+
+.flip-card.flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-front,
+.flip-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  top: 0;
+  left: 0;
+  border-radius: 0.75rem;
+}
+
+.flip-back {
+  transform: rotateY(180deg);
+}
+/* ===== Universal header color logic ===== */
+h1, h2 {
+  color: #1d4732; /* Light mode forest green */
+  transition: color 0.3s ease-in-out;
+}
+
+.dark h1,
+.dark h2 {
+  color: #eaeaea !important; /* Dark mode white overrides inline color */
+}
+
+/* Header text colors for themes */
+header a,
+header nav {
+  color: #2b2b2b; /* Light mode: charcoal */
+}
+
+.dark header a,
+.dark header nav {
+  color: #eaeaea; /* Dark mode: white */
+}
+
+/* Ensure hover highlight overrides dark text */
+header a:hover,
+header nav a:hover {
+  color: #f5c76a !important; /* Gold accent on hover */
+}
+/* ===== Fix for publication titles on white cards ===== */
+.publication-title {
+  color: var(--color-primary, #1d4732); /* light mode green accent */
+  transition: color 0.3s ease-in-out;
+}
+
+/* In dark mode, make the text dark so it stands out on white card */
+.dark .publication-title {
+  color: #1d1d1d !important;
+}
+/* ===== Publication buttons dark-mode styling ===== */
+.publication-button {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Dark mode — white text and white outline */
+.dark .publication-button {
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+/* Optional: make hover smoother and consistent in dark mode */
+.dark .publication-button:hover {
+  background-color: #ffffff !important;
+  color: #0b132b !important; /* deep navy background color */
+}
+/* ===== Publication buttons dark-mode styling ===== */
+.publication-button {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Dark mode — white text + border */
+.dark .publication-button {
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+  background-color: transparent !important;
+}
+
+/* Use a stronger selector to override Tailwind hover classes */
+.dark a.publication-button:hover {
+  background-color: #f5c76a !important;  /* your gold accent */
+  color: #0b132b !important;             /* dark navy text */
+  border-color: #f5c76a !important;
+}
+
+/* ===== Project card text colors in light mode ===== */
+.project-card h3,
+.project-card p,
+.project-card span {
+  color: #1d4732;
+}
+
+.project-card svg {
+  color: rgba(29, 71, 50, 0.6);
+}
+
+/* ===== Project card border in light mode ===== */
+.project-card {
+  border-color: #1d4732;
+}
+
+/* ===== Project card hover effects in light mode ===== */
+.project-card:hover {
+  border-color: #e9c46a;
+}
+
+.project-card:hover h3,
+.project-card:hover p,
+.project-card:hover span {
+  color: #e9c46a;
+}
+
+.project-card:hover svg {
+  color: #e9c46a;
+}
+
+/* ===== Project card text colors in dark mode (must come after light mode) ===== */
+.dark .project-card h3,
+.dark .project-card p,
+.dark .project-card span {
+  color: #ffffff !important;
+}
+
+.dark .project-card svg {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* ===== Project card border in dark mode ===== */
+.dark .project-card {
+  border-color: #ffffff !important;
+}
+
+/* ===== Project card hover effects in dark mode ===== */
+.dark .project-card:hover h3,
+.dark .project-card:hover p,
+.dark .project-card:hover span {
+  color: #f5c76a !important;
+}
+
+.dark .project-card:hover svg {
+  color: #f5c76a !important;
+}
+
+.dark .project-card:hover {
+  border-color: #f5c76a !important;
+}
+
+/* Back to Projects link */
+button.back-to-projects,
+.back-to-projects {
+  color: #1d4732 !important;
+}
+
+button.back-to-projects:hover,
+.back-to-projects:hover {
+  color: #1d4732 !important;
+  opacity: 0.8;
+}
+
+/* Back to Projects link in dark mode */
+.dark .back-to-projects {
+  color: #ffffff !important;
+}
+
+.dark .back-to-projects:hover {
+  color: #f5c76a !important;
+}
+
+/* ===== Magic Card / Bento Grid text colors (HOME PAGE ONLY) ===== */
+/* Only apply to cards on home page, not about page widgets */
+.home-bento .magic-card h3,
+.home-bento .magic-card p {
+  color: #1d4732 !important; /* Forest green in light mode */
+}
+
+.dark .home-bento .magic-card h3,
+.dark .home-bento .magic-card p {
+  color: #ffffff !important; /* White in dark mode */
+}
+
+/* ===== Landing page hero text colors (home page only) ===== */
+/* Removed broad section p rules that were breaking about page widgets */
+
+/* ===== Photography page - always white text on image overlays ===== */
+.photo-overlay h2,
+.photo-overlay h3,
+.photo-overlay p {
+  color: #ffffff !important;
+}
