@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // ✅ Named export — required by Next.js
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Protect the secret content route
@@ -20,7 +20,7 @@ export function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-// ✅ Only run middleware on specific paths
+// ✅ Only run proxy on specific paths
 export const config = {
   matcher: ["/secret-content/:path*"],
 };
