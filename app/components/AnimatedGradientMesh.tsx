@@ -13,7 +13,9 @@ type LavaBlobProps = {
   width: string;
   height: string;
   style: React.CSSProperties;
-} & Pick<MotionProps, "animate" | "transition">;
+  animate: any;
+  transition: any;
+};
 
 // Glossy lava blob component
 const LavaBlob = ({
@@ -33,8 +35,8 @@ const LavaBlob = ({
       height,
       ...style,
     }}
-    animate={animate}
-    transition={transition}
+    animate={animate as any}
+    transition={transition as any}
   >
     {/* Main blob body with glossy gradient */}
     <div
