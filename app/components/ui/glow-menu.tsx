@@ -1,7 +1,7 @@
 "use client"
 
 import type * as React from "react"
-import { motion } from "framer-motion"
+import { motion, type Variants } from "framer-motion"
 import { Briefcase, Camera, FolderOpen, User } from "lucide-react"
 
 interface MenuItem {
@@ -57,14 +57,14 @@ const backVariants = {
   hover: { rotateX: 0, opacity: 1 },
 }
 
-const glowVariants = {
+const glowVariants: Variants = {
   initial: { opacity: 0, scale: 0.8 },
   hover: {
     opacity: 1,
     scale: 2,
     transition: {
-      opacity: { duration: 0.5, ease: "easeOut" as const },
-      scale: { duration: 0.5, type: "spring" as const, stiffness: 300, damping: 25 },
+      opacity: { duration: 0.5 },
+      scale: { duration: 0.5, type: "spring", stiffness: 300, damping: 25 },
     },
   },
 }
