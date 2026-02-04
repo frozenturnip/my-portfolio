@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useEffect, useState, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { useSpotifyPlayer } from "../components/SpotifyPlayerProvider";
 import { ParticleCard, GlobalSpotlight, MagicBentoStyles } from "../components/MagicBentoEffects";
 import StravaWidget from "../components/StravaWidget";
 
@@ -18,8 +17,7 @@ const Model3DViewer = dynamic(() => import("../components/Model3DViewer"), {
   ),
 });
 
-const PLAYLIST_URI = "spotify:playlist:158abfUjGh8Qnv8ARgJ5gD";
-const PLAYLIST_URL = "https://open.spotify.com/playlist/158abfUjGh8Qnv8ARgJ5gD";
+const PLAYLIST_URL = "https://open.spotify.com/user/savsandi";
 
 // Hardcoded podcast episodes - using direct simplecast URLs
 const PODCAST_EPISODES = [
@@ -29,14 +27,68 @@ const PODCAST_EPISODES = [
   },
 ];
 
-const DEFAULT_TRACK = {
-  name: "Through My Teeth",
-  artist: "Spacey Jane",
-  albumName: "If That Makes Sense",
-  imageUrl:
-    "https://i.scdn.co/image/ab67616d0000b2739fe3926eb983737355294527",
-  isExplicit: true,
-};
+const MUSIC_TRACKS = [
+  {
+    title: "Right Here, For Now",
+    artist: "Bakar",
+    url: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/tracks/Bakar%20-%20Right%20Here,%20For%20Now.mp3",
+    cover: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/covers/Right%20Here,%20For%20Now.jpg",
+  },
+  {
+    title: "Delete Ya",
+    artist: "Djo",
+    url: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/tracks/Djo%20-%20Delete%20Ya.mp3",
+    cover: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/covers/Delete%20Ya.jpg",
+  },
+  {
+    title: "Casita",
+    artist: "Goth Babe",
+    url: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/tracks/Goth%20Babe%20-%20Casita.mp3",
+    cover: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/covers/Casita.jpg",
+  },
+  {
+    title: "What Once Was",
+    artist: "Her's",
+    url: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/tracks/Her%27s%20-%20What%20Once%20Was.mp3",
+    cover: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/covers/What%20Once%20Was.jpg",
+  },
+  {
+    title: "Salad Days",
+    artist: "Mac DeMarco",
+    url: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/tracks/Mac%20Demarco%20-%20Salad%20Days.mp3",
+    cover: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/covers/Salad%20Days.jpg",
+  },
+  {
+    title: "What's Going On",
+    artist: "Marvin Gaye",
+    url: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/tracks/Marvin%20Gaye%20-%20What%27s%20Going%20On.mp3",
+    cover: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/covers/What%27s%20Goin%20On.jpg",
+  },
+  {
+    title: "Am I Dreaming",
+    artist: "Metro Boomin, A$AP Rocky, Roisee",
+    url: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/tracks/Metro%20Boomin,%20A$AP%20Rocky,%20Roisee%20-%20Am%20I%20Dreaming.mp3",
+    cover: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/covers/Am%20I%20Dreaming.jpg",
+  },
+  {
+    title: "Baby Come Back",
+    artist: "Player",
+    url: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/tracks/Player%20-%20Baby%20Come%20Back.mp3",
+    cover: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/covers/Baby%20Come%20Back.jpg",
+  },
+  {
+    title: "Who's Your Boyfriend",
+    artist: "Royel Otis",
+    url: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/tracks/Royel%20Otis%20-%20Who%27s%20your%20Boyfriend.mp3",
+    cover: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/covers/Who%27s%20Your%20Boyfriend.jpg",
+  },
+  {
+    title: "Remember When",
+    artist: "Wallows",
+    url: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/tracks/Wallows%20-%20Remember%20When.mp3",
+    cover: "https://cdn.jsdelivr.net/gh/frozenturnip/website-music-player@main/covers/Remember%20When.jpg",
+  },
+];
 
 /* ---------- Tiny SVG ICONS ---------- */
 
@@ -154,6 +206,10 @@ export default function AboutPage() {
   const { theme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [lastVolumeBeforeMute, setLastVolumeBeforeMute] = useState(0.5);
+  const [currentMusicIndex, setCurrentMusicIndex] = useState(0);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [musicVolume, setMusicVolume] = useState(0.8);
+  const [lastMusicVolume, setLastMusicVolume] = useState(0.8);
   
   // Grid ref for spotlight effect
   const gridRef = useRef<HTMLDivElement>(null);
@@ -192,20 +248,9 @@ export default function AboutPage() {
   
   // Single audio ref
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const musicAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const currentEpisode = PODCAST_EPISODES[currentEpisodeIndex];
-
-  const {
-    isReady,
-    isPlaying,
-    currentTrack,
-    playPlaylist,
-    togglePlay,
-    next,
-    previous,
-    volume,
-    setPlayerVolume,
-  } = useSpotifyPlayer();
 
   // Sync audio element volume
   useEffect(() => {
@@ -222,13 +267,14 @@ export default function AboutPage() {
     if (isPodcastPlaying) {
       audio.pause();
     } else {
-      // Pause Spotify if it's playing
-      if (isPlaying) {
-        await togglePlay();
-      }
-      audio.play().catch(console.error);
+      audio.play().catch((err) => {
+        // Ignore AbortError from rapid pause/seek; log others
+        if ((err as any)?.name !== "AbortError") {
+          console.error(err);
+        }
+      });
     }
-  }, [isPodcastPlaying, isPlaying, togglePlay]);
+  }, [isPodcastPlaying]);
 
   const handlePodcastMuteToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -245,7 +291,11 @@ export default function AboutPage() {
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
       if (isPodcastPlaying) {
-        audioRef.current.play().catch(console.error);
+        audioRef.current.play().catch((err) => {
+          if ((err as any)?.name !== "AbortError") {
+            console.error(err);
+          }
+        });
       }
     }
   }, [isPodcastPlaying]);
@@ -254,49 +304,99 @@ export default function AboutPage() {
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
       if (isPodcastPlaying) {
-        audioRef.current.play().catch(console.error);
+        audioRef.current.play().catch((err) => {
+          if ((err as any)?.name !== "AbortError") {
+            console.error(err);
+          }
+        });
       }
     }
   }, [isPodcastPlaying]);
+
+  const currentMusic = MUSIC_TRACKS[currentMusicIndex];
+
+  // Sync music element volume
+  useEffect(() => {
+    if (musicAudioRef.current) {
+      musicAudioRef.current.volume = musicVolume;
+    }
+  }, [musicVolume]);
+
+  const handleMusicPlayPause = useCallback(() => {
+    const audio = musicAudioRef.current;
+    if (!audio) return;
+
+    // Pause podcast if music starts
+    if (audio.paused) {
+      if (isPodcastPlaying && audioRef.current) {
+        audioRef.current.pause();
+      }
+      audio
+        .play()
+        .then(() => setIsMusicPlaying(true))
+        .catch(console.error);
+    } else {
+      audio.pause();
+      setIsMusicPlaying(false);
+    }
+  }, [isPodcastPlaying]);
+
+  const handleMusicNext = useCallback(() => {
+    setCurrentMusicIndex((prev) => (prev + 1) % MUSIC_TRACKS.length);
+  }, []);
+
+  const handleMusicPrevious = useCallback(() => {
+    setCurrentMusicIndex((prev) =>
+      prev === 0 ? MUSIC_TRACKS.length - 1 : prev - 1
+    );
+  }, []);
+
+  const handleMusicEnded = useCallback(() => {
+    setCurrentMusicIndex((prev) => (prev + 1) % MUSIC_TRACKS.length);
+  }, []);
+
+  const handleMusicMuteToggle = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (musicVolume > 0.001) {
+        setLastMusicVolume(musicVolume);
+        setMusicVolume(0);
+      } else {
+        setMusicVolume(lastMusicVolume || 0.8);
+      }
+    },
+    [musicVolume, lastMusicVolume]
+  );
+
+  // If track index changes while playing, continue playback on new track
+  useEffect(() => {
+    const audio = musicAudioRef.current;
+    if (!audio) return;
+    audio.currentTime = 0;
+    if (isMusicPlaying) {
+      audio.play().catch((err) => {
+        if ((err as any)?.name !== "AbortError") {
+          console.error(err);
+        }
+      });
+    }
+  }, [currentMusicIndex, isMusicPlaying]);
+
+  // Prefetch all album covers on the client to reduce image swap lag
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    MUSIC_TRACKS.forEach((track) => {
+      if (!track.cover) return;
+      const img = new window.Image();
+      img.src = track.cover;
+    });
+  }, []);
 
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
   const currentTheme = theme === "system" ? systemTheme : theme;
   const isDark = currentTheme === "dark";
-
-  const handleSpotifyCardClick = async () => {
-    if (!isReady) return;
-    
-    // Pause podcast if it's playing
-    if (isPodcastPlaying && audioRef.current) {
-      audioRef.current.pause();
-    }
-    
-    if (!isPlaying && !currentTrack) {
-      // Only start the playlist if nothing is playing yet
-      await playPlaylist(PLAYLIST_URI);
-    } else {
-      // Resume/pause the current track
-      await togglePlay();
-    }
-  };
-
-  const handleMuteToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (volume > 0.001) {
-      setLastVolumeBeforeMute(volume);
-      setPlayerVolume(0);
-    } else {
-      setPlayerVolume(lastVolumeBeforeMute || 0.5);
-    }
-  };
-
-  const title = currentTrack?.name ?? DEFAULT_TRACK.name;
-  const subtitle = currentTrack
-    ? `${currentTrack.artist} — ${currentTrack.album}`
-    : `${DEFAULT_TRACK.artist} — ${DEFAULT_TRACK.albumName}`;
-  const cover = currentTrack?.imageUrl ?? DEFAULT_TRACK.imageUrl;
 
   const squareCardBase = `
     relative col-span-1
@@ -421,10 +521,10 @@ export default function AboutPage() {
         {/* ========= RIGHT COLUMN ========= */}
         <section className="flex flex-col gap-6 h-full">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-    {/* ------- SPOTIFY WIDGET ------- */}
+    {/* ------- MUSIC WIDGET ------- */}
     <ParticleCard
       className={`${squareCardBase} overflow-hidden cursor-pointer`}
-      onClick={handleSpotifyCardClick}
+      onClick={handleMusicPlayPause}
       disableAnimations={isMobile}
       glowColor={MAGIC_GLOW_COLOR}
       enableTilt={false}
@@ -432,19 +532,28 @@ export default function AboutPage() {
       clickEffect={false}
       particleCount={0}
     >
+            {/* Hidden audio element for music queue */}
+            <audio
+              ref={musicAudioRef}
+              src={currentMusic.url}
+              preload="auto"
+              onEnded={handleMusicEnded}
+              className="hidden"
+            />
+
             {/* overlay */}
             <div
               className={`
                 pointer-events-none absolute inset-0 bg-[#1DB954]
                 origin-top-right scale-0 transition-transform duration-500
-                ${isPlaying ? "scale-150" : ""}
+                ${isMusicPlaying ? "scale-150" : ""}
               `}
             />
 
             <div className="relative h-full p-4 flex flex-col text-zinc-900">
               {/* header */}
               <div className="flex items-center justify-between mb-3">
-                <p className={`text-[0.65rem] font-semibold tracking-[0.2em] uppercase transition-colors duration-500 ${isPlaying ? "text-white opacity-90" : "text-zinc-900 opacity-70"}`}>
+                <p className={`text-[0.65rem] font-semibold tracking-[0.2em] uppercase transition-colors duration-500 ${isMusicPlaying ? "text-white opacity-90" : "text-zinc-900 opacity-70"}`}>
                   Listening to
                 </p>
 
@@ -491,8 +600,8 @@ export default function AboutPage() {
                   >
                     <div className="relative w-full h-full rounded-lg overflow-hidden">
                       <Image
-                        src={cover}
-                        alt="Album cover"
+                        src={currentMusic.cover ?? "/images/spotify-logo.jpg"}
+                        alt={`${currentMusic.title} cover art`}
                         fill
                         className="object-cover"
                       />
@@ -501,38 +610,17 @@ export default function AboutPage() {
                 </a>
 
                 <div className="flex flex-col items-start min-w-0 mt-auto">
-                  <p className={`text-sm font-semibold flex items-center gap-1 leading-tight transition-colors duration-500 ${isPlaying ? "text-white" : "text-zinc-900"}`}>
+                  <p className={`text-sm font-semibold flex items-center gap-1 leading-tight transition-colors duration-500 ${isMusicPlaying ? "text-white" : "text-zinc-900"}`}>
                     <span className="truncate max-w-[200px] sm:max-w-60">
-                      {title}
+                      {currentMusic.title}
                     </span>
-
-                    {(currentTrack as any)?.explicit && (
-                      <span
-                        className={`
-                          text-[0.6rem] leading-none 
-                          px-1.5 py-0.5 
-                          rounded-[3px] 
-                          tracking-[0.08em] uppercase
-                          transition-colors duration-500
-                          ${isPlaying 
-                            ? "border border-white/50 bg-white/20 text-white" 
-                            : "border border-zinc-400/70 bg-zinc-100 text-zinc-700"}
-                        `}
-                      >
-                        E
-                      </span>
-                    )}
                   </p>
 
-                  <p className={`text-xs truncate max-w-[230px] sm:max-w-[260px] transition-colors duration-500 ${isPlaying ? "text-white opacity-90" : "text-zinc-900 opacity-80"}`}>
-                    {subtitle}
+                  <p className={`text-xs truncate max-w-[230px] sm:max-w-[260px] transition-colors duration-500 ${isMusicPlaying ? "text-white opacity-90" : "text-zinc-900 opacity-80"}`}>
+                    {currentMusic.artist}
                   </p>
 
-                  {!isReady && (
-                    <p className="mt-1 text-[0.7rem] text-zinc-900 opacity-60">
-                      Loading…
-                    </p>
-                  )}
+                  {/* Public display: no user connect flow */}
                 </div>
               </div>
 
@@ -541,16 +629,101 @@ export default function AboutPage() {
                 className="w-full px-4 mt-auto"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="mt-3 w-full">
-                  <iframe
-                    title="Spotify playlist"
-                    src="https://open.spotify.com/embed/playlist/158abfUjGh8Qnv8ARgJ5gD?utm_source=generator&theme=0"
-                    width="100%"
-                    height="152"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    loading="lazy"
-                    className="rounded-xl border border-zinc-200/70"
-                  />
+                <div
+                  className={`
+                    mt-2
+                    w-full max-w-[260px] mx-auto
+                    rounded-full 
+                    px-1 py-1 sm:py-1.5
+                    flex items-center justify-between
+                    transition-colors duration-500
+                    ${isMusicPlaying ? "bg-[#1DB954] border-transparent" : "bg-white border border-zinc-300"}
+                  `}
+                >
+                  <a
+                    href={PLAYLIST_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group/btn w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-colors duration-500"
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label="Open in Spotify"
+                    title="Open in Spotify"
+                  >
+                    <ExternalIcon
+                      className={`w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2] transition-colors duration-200 ${
+                        isMusicPlaying ? "stroke-white" : "stroke-zinc-700"
+                      }`}
+                    />
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleMusicPrevious(); }}
+                    className="group/btn w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-colors duration-500"
+                    aria-label="Previous"
+                    title="Previous"
+                  >
+                    <PrevIcon
+                      className={`w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2] transition-colors duration-200 ${
+                        isMusicPlaying ? "stroke-white" : "stroke-zinc-700"
+                      }`}
+                    />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleMusicPlayPause(); }}
+                    className={`
+                      group/btn w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center 
+                      rounded-full
+                      transition-all duration-150
+                      ${isMusicPlaying ? "bg-[#1AA34A] text-white ring-2 ring-white/30" : "bg-white text-zinc-700"}
+                    `}
+                    aria-label={isMusicPlaying ? "Pause" : "Play"}
+                    title={isMusicPlaying ? "Pause" : "Play"}
+                  >
+                    {isMusicPlaying ? (
+                      <PauseIcon className="w-5 h-5 sm:w-6 sm:h-6 fill-white" />
+                    ) : (
+                      <PlayIcon className="w-5 h-5 sm:w-6 sm:h-6 translate-x-px fill-zinc-700" />
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); handleMusicNext(); }}
+                    className="group/btn w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-colors duration-500"
+                    aria-label="Next"
+                    title="Next"
+                  >
+                    <NextIcon
+                      className={`w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2] transition-colors duration-200 ${
+                        isMusicPlaying ? "stroke-white" : "stroke-zinc-700"
+                      }`}
+                    />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleMusicMuteToggle}
+                    className="group/btn w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-colors duration-500"
+                    aria-label={musicVolume > 0.001 ? "Mute" : "Unmute"}
+                    title={musicVolume > 0.001 ? "Mute" : "Unmute"}
+                  >
+                    {musicVolume <= 0.001 ? (
+                      <VolumeOffIcon
+                        className={`w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2] transition-colors duration-200 ${
+                          isMusicPlaying ? "stroke-white" : "stroke-zinc-700"
+                        }`}
+                      />
+                    ) : (
+                      <VolumeOnIcon
+                        className={`w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2] transition-colors duration-200 ${
+                          isMusicPlaying ? "stroke-white" : "stroke-zinc-700"
+                        }`}
+                      />
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
