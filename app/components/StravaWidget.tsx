@@ -198,13 +198,7 @@ export default function StravaWidget({ squareCardBase, isMobile, glowColor }: St
 
       {error === "not_authenticated" && (
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-3 text-center">
-          <p className={mutedTextColor}>Connect Strava to see your running stats</p>
-          <a
-            href="/api/strava/login"
-            className="px-4 py-2 rounded-full bg-[#FC4C02] text-white text-sm font-medium hover:bg-[#E34402] transition-colors"
-          >
-            Connect Strava
-          </a>
+          <p className={mutedTextColor}>Strava stats unavailable</p>
         </div>
       )}
 

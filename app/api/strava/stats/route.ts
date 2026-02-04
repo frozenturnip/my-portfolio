@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 
+type StravaTokenCache = {
+  accessToken: string | null;
+  refreshToken: string | null;
+  expiresAt: number; // epoch seconds
+};
+
+// Module-scope cache (works well for low-traffic portfolios)
+let tokenCache: StravaTokenCache = {
+  accessToken: null,
+  refreshToken: null,
+  expiresAt: 0,
+};
+
 async function refreshToken(refreshToken: string) {
   const clientId = process.env.STRAVA_CLIENT_ID;
   const clientSecret = process.env.STRAVA_CLIENT_SECRET;
@@ -20,18 +33,38 @@ async function refreshToken(refreshToken: string) {
 }
 
 export async function GET(req: NextRequest) {
-  let accessToken = req.cookies.get("strava_access_token")?.value ?? process.env.STRAVA_ACCESS_TOKEN;
-  const refreshTokenValue = req.cookies.get("strava_refresh_token")?.value ?? process.env.STRAVA_REFRESH_TOKEN;
-  const expiresAt = Number(req.cookies.get("strava_token_expires_at")?.value ?? 0);
+  // Owner tokens (shared view for all visitors)
+  const envAccessToken = process.env.STRAVA_ACCESS_TOKEN ?? null;
+  const envRefreshToken = process.env.STRAVA_REFRESH_TOKEN ?? null;
+
+  // Prefer cached tokens, fall back to env
+  let accessToken = tokenCache.accessToken ?? envAccessToken;
+  let refreshTokenValue = tokenCache.refreshToken ?? envRefreshToken;
+  let expiresAt = tokenCache.expiresAt || 0;
 
   if (!accessToken) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Missing STRAVA_ACCESS_TOKEN/STRAVA_REFRESH_TOKEN" },
+      { status: 500 },
+    );
   }
 
-  if (expiresAt && Date.now() / 1000 > expiresAt && refreshTokenValue) {
+  // Refresh if expired (or if we only have a refresh token)
+  const now = Math.floor(Date.now() / 1000);
+  const isExpired = expiresAt ? now > expiresAt : false;
+  if ((isExpired || !accessToken) && refreshTokenValue) {
     const refreshed = await refreshToken(refreshTokenValue);
     if (refreshed?.access_token) {
       accessToken = refreshed.access_token;
+      // Strava rotates refresh tokens — keep the newest in memory
+      refreshTokenValue = refreshed.refresh_token ?? refreshTokenValue;
+      expiresAt = Number(refreshed.expires_at ?? 0);
+
+      tokenCache = {
+        accessToken,
+        refreshToken: refreshTokenValue,
+        expiresAt,
+      };
     }
   }
 
@@ -100,31 +133,5 @@ export async function GET(req: NextRequest) {
     })),
   };
 
-  const res = NextResponse.json(response);
-
-  if (refreshTokenValue && Date.now() / 1000 > expiresAt) {
-    const refreshed = await refreshToken(refreshTokenValue);
-    if (refreshed?.access_token) {
-      res.cookies.set("strava_access_token", refreshed.access_token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-      });
-      res.cookies.set("strava_refresh_token", refreshed.refresh_token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-      });
-      res.cookies.set("strava_token_expires_at", String(refreshed.expires_at ?? 0), {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-      });
-    }
-  }
-
-  return res;
+  return NextResponse.json(response);
 }

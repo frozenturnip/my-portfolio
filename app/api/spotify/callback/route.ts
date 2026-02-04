@@ -51,13 +51,17 @@ export async function GET(req: NextRequest) {
     return new NextResponse("No refresh token from Spotify", { status: 500 });
   }
 
-  // Set refresh token cookie for future /access-token calls
-  const res = NextResponse.redirect("http://127.0.0.1:3000/about");
+  // Redirect back to the same site (works on localhost and production)
+  const origin = url.origin;
+  const redirectUrl = `${origin}/about`;
 
+  const res = NextResponse.redirect(redirectUrl);
+
+  const isSecure = url.protocol === "https:";
   res.cookies.set("spotify_refresh_token", refreshToken, {
     httpOnly: true,
     sameSite: "lax",
-    secure: false,
+    secure: isSecure,
     path: "/",
     maxAge: 60 * 60 * 24 * 30, // 30 days
   });

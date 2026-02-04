@@ -396,7 +396,7 @@ export default function AboutPage() {
                 Where I&apos;m at now
               </h2>
               <p className="text-[0.7rem] @sm:text-xs @md:text-sm @lg:text-base @xl:text-lg leading-relaxed text-zinc-900!">
-                Right now I&apos;m in Los Angeles, studying mechanical
+                Right now, I&apos;m in Los Angeles, studying mechanical
                 engineering and working on projects that blend robotics, medical
                 devices, and patient-experience work. When I&apos;m not in the
                 lab, you can usually find me on a run, practicing my tennis service, or out shooting photos.
@@ -530,7 +530,7 @@ export default function AboutPage() {
 
                   {!isReady && (
                     <p className="mt-1 text-[0.7rem] text-zinc-900 opacity-60">
-                      Connecting to Spotify…
+                      Loading…
                     </p>
                   )}
                 </div>
@@ -541,76 +541,16 @@ export default function AboutPage() {
                 className="w-full px-4 mt-auto"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div
-                  className={`
-                    mt-2
-                    w-full max-w-[260px] mx-auto
-                    rounded-full 
-                    px-1 py-1 sm:py-1.5
-                    flex items-center justify-between
-                    transition-colors duration-500
-                    ${isPlaying ? "bg-[#1DB954]" : "bg-white border border-zinc-300"}
-                  `}
-                >
-                  <a
-                    href={PLAYLIST_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-colors duration-500"
-                  >
-                    <ExternalIcon className={`w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2] transition-colors duration-200 ${isPlaying ? "stroke-white" : "stroke-zinc-700"}`} />
-                  </a>
-
-                  <button
-                    type="button"
-                    onClick={previous}
-                    disabled={!isReady}
-                    className="group w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full disabled:opacity-30 transition-colors duration-500"
-                  >
-                    <PrevIcon className={`w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2] transition-colors duration-200 ${isPlaying ? "stroke-white" : "stroke-zinc-700"}`} />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleSpotifyCardClick}
-                    disabled={!isReady}
-                    className={`
-                      group w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center 
-                      rounded-full
-                      disabled:opacity-30
-                      transition-all duration-150
-                      focus:outline-none active:outline-none
-                      ${isPlaying ? "bg-[#1DB954] text-white ring-2 ring-white/30" : "bg-white text-zinc-700 focus:ring-0"}
-                    `}
-                  >
-                    {isPlaying ? (
-                      <PauseIcon className="w-5 h-5 sm:w-6 sm:h-6 fill-white" />
-                    ) : (
-                      <PlayIcon className="w-5 h-5 sm:w-6 sm:h-6 translate-x-px fill-zinc-700" />
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={next}
-                    disabled={!isReady}
-                    className="group w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full disabled:opacity-30 transition-colors duration-500"
-                  >
-                    <NextIcon className={`w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2] transition-colors duration-200 ${isPlaying ? "stroke-white" : "stroke-zinc-700"}`} />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleMuteToggle}
-                    disabled={!isReady}
-                    className="group w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full disabled:opacity-30 transition-colors duration-500"
-                  >
-                    {volume > 0.001 ? (
-                      <VolumeOnIcon className={`w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2] transition-colors duration-200 ${isPlaying ? "stroke-white" : "stroke-zinc-700"}`} />
-                    ) : (
-                      <VolumeOffIcon className={`w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2] transition-colors duration-200 ${isPlaying ? "stroke-white" : "stroke-zinc-700"}`} />
-                    )}
-                  </button>
+                <div className="mt-3 w-full">
+                  <iframe
+                    title="Spotify playlist"
+                    src="https://open.spotify.com/embed/playlist/158abfUjGh8Qnv8ARgJ5gD?utm_source=generator&theme=0"
+                    width="100%"
+                    height="152"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"
+                    className="rounded-xl border border-zinc-200/70"
+                  />
                 </div>
               </div>
             </div>

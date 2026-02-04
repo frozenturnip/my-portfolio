@@ -245,7 +245,7 @@ export default function ProfessionalPage() {
 
   const roles: Role[] = [
     {
-      title: "Surgical Robotics — R&D Intern",
+      title: "Surgical Robotics — R&D",
       date: "Summer 2025 · Lafayette, CO",
       color: "blue",
       points: [
@@ -255,7 +255,7 @@ export default function ProfessionalPage() {
       ],
     },
     {
-      title: "RPM Test Hardware — R&D Intern",
+      title: "RPM Test Hardware — R&D",
       date: "Summer 2024 · Lafayette, CO",
       color: "purple",
       points: [
@@ -265,7 +265,7 @@ export default function ProfessionalPage() {
       ],
     },
     {
-      title: "Sterilization & Operations Engineering — Intern",
+      title: "Sterilization & Operations Engineering",
       date: "Summer 2023 · Lafayette, CO",
       color: "green",
       points: [

@@ -20,10 +20,13 @@ export async function GET(req: NextRequest) {
 
   // store state in a short-lived cookie for CSRF protection
   const res = NextResponse.redirect(url.toString());
+  const requestUrl = new URL(req.url);
+  const isSecure = requestUrl.protocol === "https:";
+  // SameSite=None + Secure so cookie is sent when Spotify redirects back (cross-site)
   res.cookies.set("spotify_auth_state", state, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false,
+    sameSite: isSecure ? "none" : "lax",
+    secure: isSecure,
     path: "/",
     maxAge: 10 * 60, // 10 minutes
   });
