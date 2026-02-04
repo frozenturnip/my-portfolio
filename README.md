@@ -34,3 +34,14 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+### Production env vars (atasso-portfolio)
+
+In Vercel → **Settings → Environment Variables**, set these for **Production** (and Preview if you use it). Replace with your custom domain if you use one.
+
+| Name | Value |
+|------|--------|
+| `SPOTIFY_REDIRECT_URI` | `https://atasso-portfolio.vercel.app/api/spotify/callback` |
+| `STRAVA_REDIRECT_URI` | `https://atasso-portfolio.vercel.app/api/strava/callback` |
+
+Then redeploy so the new values are used.

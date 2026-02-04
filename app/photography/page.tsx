@@ -170,10 +170,10 @@ const galleryItems = galleryImages;
   
 
   return (
-    <div className="flex flex-col">
+    <section className="py-8 w-full flex flex-col gap-10">
 
       {/* ===== HERO SECTION ===== */}
-<section className="relative w-full max-w-[1300px] mx-auto h-[90vh] mt-5 rounded-xl overflow-hidden shadow-md">
+<section className="relative w-full max-w-[1300px] mx-auto h-[90vh] rounded-xl overflow-hidden shadow-md">
         <Swiper
           modules={[Autoplay, Navigation, Pagination]}
           autoplay={{ delay: 4000, disableOnInteraction: false }}
@@ -217,8 +217,8 @@ const galleryItems = galleryImages;
         </div>
       </section>
 
-{/* ===== GALLERY SECTION ===== */}
-<section className="px-8 sm:px-12 md:px-24 py-16 space-y-8 bg-background dark:bg-darkbg text-center">
+      {/* ===== GALLERY SECTION ===== */}
+      <section className="px-8 sm:px-12 md:px-24 py-16 space-y-8 bg-background dark:bg-darkbg text-center">
   <h2 className="text-4xl md:text-5xl font-extrabold text-primary dark:text-darkaccent whitespace-nowrap mx-auto">
     Gallery
   </h2>
@@ -284,6 +284,6 @@ const galleryItems = galleryImages;
     />
   </div>
 </section>
-    </div>
+    </section>
   );
 }

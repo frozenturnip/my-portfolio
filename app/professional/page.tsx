@@ -315,9 +315,10 @@ useEffect(() => {
   return () => window.removeEventListener("resize", updateHeights);
 }, [roles.length]);
   return (
-    <div className="flex flex-col bg-background dark:bg-darkbg transition-colors duration-500">
+    <section className="py-8 w-full flex flex-col gap-10 bg-background dark:bg-darkbg transition-colors duration-500">
       {/* ===== HERO ===== */}
-      <section className="relative w-full max-w-[1350px] mx-auto h-[90vh] mt-5 rounded-xl overflow-hidden shadow-lg">
+      <div className="w-full relative">
+      <section className="relative w-full max-w-[1350px] mx-auto h-[90vh] rounded-xl overflow-hidden shadow-lg">
         <div className="relative w-full h-full overflow-hidden rounded-xl border border-neutral-800 bg-neutral-950 shadow-2xl flex flex-col items-center justify-center">
           <DitheringBackground
             color="#5A9DF9"
@@ -363,6 +364,7 @@ useEffect(() => {
           </div>
         </div>
       </section>
+      </div>
 
       {/* ===== INDUSTRY EXPERIENCE ===== */}
       <section
@@ -659,7 +661,7 @@ style={{
     </motion.a>
   </div>
 </motion.div>
-    </div>
+    </section>
   );
 }    
 
