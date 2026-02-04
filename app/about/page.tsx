@@ -259,16 +259,20 @@ export default function AboutPage() {
     }
   }, [podcastVolume]);
 
-  // Podcast controls - pause Spotify when starting podcast
+  // Podcast controls - pause music widget when starting podcast
   const handlePodcastPlayPause = useCallback(async () => {
     const audio = audioRef.current;
     if (!audio) return;
-    
+
     if (isPodcastPlaying) {
       audio.pause();
     } else {
+      // Pause music widget if it's playing so only one plays at a time
+      if (musicAudioRef.current && !musicAudioRef.current.paused) {
+        musicAudioRef.current.pause();
+        setIsMusicPlaying(false);
+      }
       audio.play().catch((err) => {
-        // Ignore AbortError from rapid pause/seek; log others
         if ((err as any)?.name !== "AbortError") {
           console.error(err);
         }
