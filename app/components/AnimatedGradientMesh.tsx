@@ -2,6 +2,8 @@
 
 import { motion, type MotionProps } from "framer-motion";
 
+const MotionDiv = motion.div as unknown as React.ComponentType<any>;
+
 interface AnimatedGradientMeshProps {
   className?: string;
 }
@@ -28,7 +30,7 @@ const LavaBlob = ({
   animate,
   transition,
 }: LavaBlobProps) => (
-  <motion.div
+  <MotionDiv
     className="absolute"
     style={{
       width,
@@ -77,7 +79,7 @@ const LavaBlob = ({
         filter: "blur(2px)",
       }}
     />
-  </motion.div>
+  </MotionDiv>
 );
 
 export default function AnimatedGradientMesh({
