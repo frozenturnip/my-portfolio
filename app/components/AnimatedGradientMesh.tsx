@@ -23,8 +23,8 @@ const LavaBlob = ({
   width: string;
   height: string;
   style: React.CSSProperties;
-  animate: MotionProps["animate"];
-  transition: MotionProps["transition"];
+  animate: MotionProps["animate"] | any;
+  transition: MotionProps["transition"] | any;
 }) => (
   <motion.div
     className="absolute"
@@ -33,8 +33,8 @@ const LavaBlob = ({
       height,
       ...style,
     }}
-    animate={animate as MotionProps["animate"]}
-    transition={transition as MotionProps["transition"]}
+    animate={animate as any}
+    transition={transition as any}
   >
     {/* Main blob body with glossy gradient */}
     <div
