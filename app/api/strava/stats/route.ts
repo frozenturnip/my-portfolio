@@ -82,13 +82,34 @@ export async function GET(req: NextRequest) {
     fetch(`https://www.strava.com/api/v3/athletes/${athlete.id}/stats`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     }),
-    fetch("https://www.strava.com/api/v3/athlete/activities?per_page=5", {
+    fetch("https://www.strava.com/api/v3/athlete/activities?per_page=10", {
       headers: { Authorization: `Bearer ${accessToken}` },
     }),
   ]);
 
   const stats = statsRes.ok ? await statsRes.json() : null;
-  const activities = activitiesRes.ok ? await activitiesRes.json() : [];
+  const rawActivities =
+    activitiesRes.ok && activitiesRes.status === 200
+      ? await activitiesRes.json()
+      : [];
+
+  // Map and sort by date descending so the first is always the most recent
+  const recentActivities = (Array.isArray(rawActivities) ? rawActivities : [])
+    .map((activity: any) => ({
+      id: activity.id,
+      name: activity.name,
+      type: activity.type,
+      sportType: activity.sport_type,
+      distance: activity.distance,
+      movingTime: activity.moving_time,
+      elevation: activity.total_elevation_gain,
+      date: activity.start_date,
+      avgSpeed: activity.average_speed,
+      avgHeartrate: activity.average_heartrate ?? undefined,
+    }))
+    .sort((a: { date: string }, b: { date: string }) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
 
   const response = {
     athlete: {
@@ -119,18 +140,7 @@ export async function GET(req: NextRequest) {
           },
         }
       : null,
-    recentActivities: (activities ?? []).map((activity: any) => ({
-      id: activity.id,
-      name: activity.name,
-      type: activity.type,
-      sportType: activity.sport_type,
-      distance: activity.distance,
-      movingTime: activity.moving_time,
-      elevation: activity.total_elevation_gain,
-      date: activity.start_date,
-      avgSpeed: activity.average_speed,
-      avgHeartrate: activity.average_heartrate ?? undefined,
-    })),
+    recentActivities,
   };
 
   return NextResponse.json(response);

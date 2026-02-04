@@ -210,7 +210,7 @@ export default function StravaWidget({ squareCardBase, isMobile, glowColor }: St
 
       {!loading && !error && data && (
         <div className="relative z-10 flex-1 flex flex-col">
-          {data.recentActivities[0] && (
+          {data.recentActivities?.[0]?.name ? (
             <div className="mb-3">
               <div className="flex items-center gap-2 mb-1">
                 <ActivityIcon
@@ -227,6 +227,12 @@ export default function StravaWidget({ squareCardBase, isMobile, glowColor }: St
                 <span>{formatTime(data.recentActivities[0].movingTime)}</span>
                 <span>{formatPace(data.recentActivities[0].avgSpeed)} /mi</span>
               </div>
+            </div>
+          ) : (
+            <div className="mb-3 flex flex-col items-center justify-center py-2">
+              <p className={`text-xs ${mutedTextColor} text-center`}>
+                Latest run not available. Re-authorize with activity access to show it.
+              </p>
             </div>
           )}
 

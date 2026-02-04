@@ -26,7 +26,8 @@ export default function ProjectsPage() {
     <section className="py-8 w-full flex flex-col gap-10">
       {/* Hero Card with Dithering */}
       <div className="w-full relative">
-        <div className="relative overflow-hidden rounded-[32px] md:rounded-[48px] border border-neutral-800 bg-neutral-950 shadow-2xl min-h-[500px] md:min-h-[550px] flex flex-col items-center justify-center">
+        <section className="relative w-full max-w-[1350px] mx-auto h-[90vh] rounded-xl overflow-hidden shadow-lg">
+        <div className="relative w-full h-full overflow-hidden rounded-xl border border-neutral-800 bg-neutral-950 shadow-2xl flex flex-col items-center justify-center">
           {/* Dithering Background */}
           <DitheringBackground 
             color="#EC4E02" 
@@ -78,9 +79,11 @@ export default function ProjectsPage() {
             </div>
           </div>
         </div>
+        </section>
       </div>
 
       {/* Featured Projects Grid */}
+      <div className="w-full max-w-[1350px] mx-auto">
       <div className="grid md:grid-cols-2 gap-6">
         {projects.map((project) => (
           <Link
@@ -109,6 +112,7 @@ export default function ProjectsPage() {
             </div>
           </Link>
         ))}
+      </div>
       </div>
     </section>
   );

@@ -409,7 +409,7 @@ useEffect(() => {
       {[
         {
           title:
-            "Undergraduate Researcher — USC Laboratory for Design of Medical & Analytical Devices",
+            "Research Fellow — USC Laboratory for Design of Medical & Analytical Devices",
           date: "Aug 2022 – May 2025 · Los Angeles, CA",
           color: "orange",
           points: [
@@ -420,13 +420,13 @@ useEffect(() => {
         },
         {
           title:
-            "Graduate Research Assistant — USC Advanced Composites Design Lab",
+            "Research Fellow — USC Advanced Composites Design Lab",
           date: "July 2025 – Present · Los Angeles, CA",
           color: "red",
           points: [
-            "Led finite element modeling and structural optimization of continuous fiber–reinforced polymer composites for SAMPE 2026 competition.",
-            "Performed vacuum infusion experiments to optimize fiber alignment and resin flow using MATLAB and SolidWorks Simulation.",
-            "Conducted delamination testing and failure analysis correlating strain energy release rate (G₁c) with laminate layup design.",
+            "Design, fabricate, and test high-performance composite structures, including a glass fiber beam that achieved 6713 lbf ultimate load and a 2581 strength-to-weight ratio for the SAMPE 2026 Student Bridge Contest",
+            "Support lab operations as Team Lead, training and mentoring new members on composite manufacturing techniques, testing procedures, and design workflows",,
+            "Contribute to advanced layup methods, vacuum infusion optimization, and additive manufacturing workflows. Conduct structural optimization and layup design to improve fiber alignment, resin flow, and fiber volume fraction for enhanced stiffness and failure resistance.",
           ],
         },
       ].map((role, i) => (

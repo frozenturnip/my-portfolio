@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import DotGrid from "./components/DotGrid";
-import { ParticleCard, GlobalSpotlight, MagicBentoStyles } from "./components/MagicBentoEffects";
+import { ParticleCard, MagicBentoStyles } from "./components/MagicBentoEffects";
 
 // Animation variants
 const containerVariants = {
@@ -189,13 +189,6 @@ export default function HomePage() {
         {/* Bento Grid */}
         <motion.div variants={itemVariants}>
           <section ref={gridRef} className="home-bento relative">
-            <GlobalSpotlight
-              gridRef={gridRef}
-              enabled={true}
-              spotlightRadius={450}
-              glowColor={glowColor}
-            />
-            
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {bentoItems.map((item, index) => (
                 <motion.div
