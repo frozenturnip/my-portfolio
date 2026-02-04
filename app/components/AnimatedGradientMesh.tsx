@@ -6,6 +6,15 @@ interface AnimatedGradientMeshProps {
   className?: string;
 }
 
+type LavaBlobProps = {
+  baseColor: string;
+  highlightColor: string;
+  glowColor: string;
+  width: string;
+  height: string;
+  style: React.CSSProperties;
+} & Pick<MotionProps, "animate" | "transition">;
+
 // Glossy lava blob component
 const LavaBlob = ({
   baseColor,
@@ -16,16 +25,7 @@ const LavaBlob = ({
   style,
   animate,
   transition,
-}: {
-  baseColor: string;
-  highlightColor: string;
-  glowColor: string;
-  width: string;
-  height: string;
-  style: React.CSSProperties;
-  animate: MotionProps["animate"] | any;
-  transition: MotionProps["transition"] | any;
-}) => (
+}: LavaBlobProps) => (
   <motion.div
     className="absolute"
     style={{
@@ -33,8 +33,8 @@ const LavaBlob = ({
       height,
       ...style,
     }}
-    animate={animate as any}
-    transition={transition as any}
+    animate={animate}
+    transition={transition}
   >
     {/* Main blob body with glossy gradient */}
     <div
