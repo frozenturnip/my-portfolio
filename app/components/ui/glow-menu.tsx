@@ -63,7 +63,7 @@ const glowVariants = {
     opacity: 1,
     scale: 2,
     transition: {
-      opacity: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
+      opacity: { duration: 0.5, ease: "easeOut" as const },
       scale: { duration: 0.5, type: "spring" as const, stiffness: 300, damping: 25 },
     },
   },
