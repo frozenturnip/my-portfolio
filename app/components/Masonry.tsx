@@ -176,37 +176,6 @@ const Masonry: React.FC<MasonryProps> = ({
     }
   };
 
-  const computedStyles = useMemo(() => {
-    if (!breakpoints) {
-      return {
-        display: "grid",
-        gridTemplateColumns: `repeat(auto-fill, minmax(${columnWidth}px, 1fr))`,
-        gap: `${gap}px`,
-        width: "100%",
-      } satisfies CSSProperties;
-    }
-
-    const sortedBreakpoints = Object.entries(breakpoints)
-      .map(([width, values]) => ({ width: Number(width), values }))
-      .sort((a, b) => a.width - b.width);
-
-    return sortedBreakpoints.reduce((acc, { width, values }) => {
-      const minWidth = `${width}px`;
-      const colWidth = values.columnWidth ?? columnWidth;
-      const bpGap = values.gap ?? gap;
-      acc[`@media (min-width: ${minWidth})`] = {
-        gridTemplateColumns: `repeat(auto-fill, minmax(${colWidth}px, 1fr))`,
-        gap: `${bpGap}px`,
-      } as CSSProperties;
-      return acc;
-    }, {
-      display: "grid",
-      gridTemplateColumns: `repeat(auto-fill, minmax(${columnWidth}px, 1fr))`,
-      gap: `${gap}px`,
-      width: "100%",
-    } as CSSProperties);
-  }, [breakpoints, columnWidth, gap]);
-
   return (
     <div
       ref={containerRef}
