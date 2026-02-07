@@ -51,6 +51,7 @@ interface DotGridProps {
   returnDuration?: number;
   className?: string;
   style?: React.CSSProperties;
+  interactive?: boolean;
 }
 
 const DotGrid = ({
@@ -66,14 +67,15 @@ const DotGrid = ({
   resistance = 750,
   returnDuration = 1.5,
   className = '',
-  style
+  style,
+  interactive = true,
 }: DotGridProps) => {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const dotsRef = useRef<Dot[]>([]);
   const pointerRef = useRef({
-    x: 0,
-    y: 0,
+    x: Number.POSITIVE_INFINITY,
+    y: Number.POSITIVE_INFINITY,
     vx: 0,
     vy: 0,
     speed: 0,
@@ -146,16 +148,19 @@ const DotGrid = ({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const { x: px, y: py } = pointerRef.current;
+      const hasPointer = interactive && Number.isFinite(px) && Number.isFinite(py);
 
       for (const dot of dotsRef.current) {
-        const ox = dot.cx + dot.xOffset;
-        const oy = dot.cy + dot.yOffset;
+        const xOffset = interactive ? dot.xOffset : 0;
+        const yOffset = interactive ? dot.yOffset : 0;
+        const ox = dot.cx + xOffset;
+        const oy = dot.cy + yOffset;
         const dx = dot.cx - px;
         const dy = dot.cy - py;
         const dsq = dx * dx + dy * dy;
 
         let style = baseColor;
-        if (dsq <= proxSq) {
+        if (hasPointer && dsq <= proxSq) {
           const dist = Math.sqrt(dsq);
           const t = 1 - dist / proximity;
           const r = Math.round(baseRgb.r + (activeRgb.r - baseRgb.r) * t);
@@ -176,7 +181,7 @@ const DotGrid = ({
 
     draw();
   return () => cancelAnimationFrame(rafId);
-  }, [proximity, baseColor, activeRgb, baseRgb, circlePath]);
+  }, [proximity, baseColor, activeRgb, baseRgb, circlePath, interactive]);
 
   useEffect(() => {
     buildGrid();
@@ -196,7 +201,32 @@ const DotGrid = ({
   }, [buildGrid]);
 
   useEffect(() => {
-  const onMove = (e: MouseEvent) => {
+    const supportsFinePointer =
+      typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches;
+
+    if (!supportsFinePointer || !interactive) {
+      pointerRef.current.x = Number.POSITIVE_INFINITY;
+      pointerRef.current.y = Number.POSITIVE_INFINITY;
+      pointerRef.current.lastTime = 0;
+      pointerRef.current.lastX = 0;
+      pointerRef.current.lastY = 0;
+      pointerRef.current.vx = 0;
+      pointerRef.current.vy = 0;
+      pointerRef.current.speed = 0;
+      return;
+    }
+
+    const wrapper = wrapperRef.current;
+
+    const resetPointer = () => {
+      pointerRef.current.x = Number.POSITIVE_INFINITY;
+      pointerRef.current.y = Number.POSITIVE_INFINITY;
+      pointerRef.current.vx = 0;
+      pointerRef.current.vy = 0;
+      pointerRef.current.speed = 0;
+    };
+
+    const onMove = (e: MouseEvent) => {
       const now = performance.now();
       const pr = pointerRef.current;
       const dt = pr.lastTime ? now - pr.lastTime : 16;
@@ -218,10 +248,10 @@ const DotGrid = ({
       pr.vy = vy;
       pr.speed = speed;
 
-  if (!canvasRef.current) return;
-  const rect = canvasRef.current.getBoundingClientRect();
-  pr.x = e.clientX - rect.left;
-  pr.y = e.clientY - rect.top;
+      if (!canvasRef.current) return;
+      const rect = canvasRef.current.getBoundingClientRect();
+      pr.x = e.clientX - rect.left;
+      pr.y = e.clientY - rect.top;
 
       for (const dot of dotsRef.current) {
         const dist = Math.hypot(dot.cx - pr.x, dot.cy - pr.y);
@@ -246,44 +276,15 @@ const DotGrid = ({
       }
     };
 
-    const onClick = (e: MouseEvent) => {
-      if (!canvasRef.current) return;
-      const rect = canvasRef.current.getBoundingClientRect();
-      const cx = e.clientX - rect.left;
-      const cy = e.clientY - rect.top;
-      for (const dot of dotsRef.current) {
-        const dist = Math.hypot(dot.cx - cx, dot.cy - cy);
-        if (dist < shockRadius && !dot._inertiaApplied) {
-          dot._inertiaApplied = true;
-          gsap.killTweensOf(dot);
-          const falloff = Math.max(0, 1 - dist / shockRadius);
-          const pushX = (dot.cx - cx) * shockStrength * falloff;
-          const pushY = (dot.cy - cy) * shockStrength * falloff;
-          gsap.to(dot, {
-            inertia: { xOffset: pushX, yOffset: pushY, resistance },
-            onComplete: () => {
-              gsap.to(dot, {
-                xOffset: 0,
-                yOffset: 0,
-                duration: returnDuration,
-                ease: 'elastic.out(1,0.75)'
-              });
-              dot._inertiaApplied = false;
-            }
-          });
-        }
-      }
-    };
-
     const throttledMove = throttle(onMove, 50);
     window.addEventListener('mousemove', throttledMove, { passive: true });
-    window.addEventListener('click', onClick);
+    wrapper?.addEventListener('mouseleave', resetPointer);
 
     return () => {
       window.removeEventListener('mousemove', throttledMove);
-      window.removeEventListener('click', onClick);
+      wrapper?.removeEventListener('mouseleave', resetPointer);
     };
-  }, [maxSpeed, speedTrigger, proximity, resistance, returnDuration, shockRadius, shockStrength]);
+  }, [maxSpeed, speedTrigger, proximity, resistance, returnDuration, shockRadius, shockStrength, interactive]);
 
   return (
     <section className={`p-4 flex items-center justify-center h-full w-full relative ${className}`} style={style}>

@@ -5,6 +5,7 @@ import Providers from "./providers";
 import Header from "./components/Header";
 import { SpotifyPlayerProvider } from "./components/SpotifyPlayerProvider"; // 🟢 NEW
 import SecretCopyrightButton from "./components/SecretCopyrightButton";
+import PixelGridBackground from "./components/PixelGridBackground";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -31,6 +32,7 @@ export default function RootLayout({
       >
         <Providers>
           <SpotifyPlayerProvider>
+            <PixelGridBackground />
             <Header />
             <main className="flex-1 px-8 sm:px-12 md:px-24 py-12 space-y-8">
               {children}

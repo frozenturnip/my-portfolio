@@ -600,6 +600,7 @@ export default function AboutPage() {
                       group-hover:shadow-md
                       aspect-square
                       h-full max-h-[120px] sm:max-h-[140px] md:max-h-40
+                      min-h-[120px]
                     "
                   >
                     <div className="relative w-full h-full rounded-lg overflow-hidden">
@@ -807,6 +808,7 @@ export default function AboutPage() {
                       hover:shadow-md
                       aspect-square
                       h-full max-h-[120px] sm:max-h-[140px] md:max-h-40
+                      min-h-[120px]
                     "
                   >
                     <div className="relative w-full h-full rounded-lg overflow-hidden">
@@ -925,7 +927,7 @@ export default function AboutPage() {
         </p>
       </div>
 
-      <div className="relative flex-1 rounded-2xl overflow-hidden">
+      <div className="relative flex-1 min-h-[380px] sm:min-h-[320px] lg:min-h-[260px] rounded-2xl overflow-hidden">
         {PHOTOS.map((photo, idx) => (
           <div
             key={photo}

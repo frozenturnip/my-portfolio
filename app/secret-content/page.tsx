@@ -55,7 +55,7 @@ export default function OchisiaGallery() {
       </section>
 
       {/* ===== AUTHOR’S NOTE ABOVE BIO ===== */}
-      <section className="max-w-6xl mx-auto py-20 px-8 flex flex-col space-y-16">
+      <section className="relative max-w-6xl mx-auto py-20 px-8 flex flex-col space-y-16">
         {/* Author’s Note (Full Width, Centered) */}
         <div className="text-center max-w-4xl mx-auto">
           <h2 className="text-4xl font-extrabold mb-6 text-primary dark:text-darkaccent">

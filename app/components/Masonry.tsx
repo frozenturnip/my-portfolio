@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useRef, CSSProperties, useMemo } from "react";
+import { useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -15,6 +16,7 @@ interface MasonryProps {
   items: MasonryItem[];
   columnWidth?: number;
   gap?: number;
+  columns?: number;
   ease?: string;
   duration?: number;
   stagger?: number;
@@ -23,12 +25,14 @@ interface MasonryProps {
   hoverScale?: number;
   blurToFocus?: boolean;
   colorShiftOnHover?: boolean;
+  breakpoints?: Record<number, { columnWidth?: number; gap?: number; columns?: number }>;
 }
 
 const Masonry: React.FC<MasonryProps> = ({
   items,
   columnWidth = 350,
   gap = 20,
+  columns,
   ease = "power3.out",
   duration = 0.6,
   stagger = 0.05,
@@ -37,9 +41,18 @@ const Masonry: React.FC<MasonryProps> = ({
   hoverScale = 0.95,
   blurToFocus = true,
   colorShiftOnHover = false,
+  breakpoints,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [gridStyle, setGridStyle] = useState<CSSProperties>(() => ({
+    display: "grid",
+    gridTemplateColumns: columns
+      ? `repeat(${columns}, minmax(0, 1fr))`
+      : `repeat(auto-fill, minmax(${columnWidth}px, 1fr))`,
+    gap: `${gap}px`,
+    width: "100%",
+  }));
 
   // Compute directional starting offsets
   const getInitialTransform = useMemo(() => {
@@ -94,6 +107,51 @@ const Masonry: React.FC<MasonryProps> = ({
     };
   }, [items, ease, duration, stagger, blurToFocus, getInitialTransform]);
 
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const sortedBreakpoints = breakpoints
+      ? Object.entries(breakpoints)
+          .map(([width, values]) => ({ width: Number(width), values }))
+          .sort((a, b) => a.width - b.width)
+      : [];
+
+    const computeGridStyle = (width: number): CSSProperties => {
+      let config = { columnWidth, gap, columns };
+      for (const bp of sortedBreakpoints) {
+        if (width >= bp.width) {
+          config = {
+            columnWidth: bp.values.columnWidth ?? config.columnWidth,
+            gap: bp.values.gap ?? config.gap,
+            columns: bp.values.columns ?? config.columns,
+          };
+        }
+      }
+
+      return {
+        display: "grid",
+        gridTemplateColumns: config.columns
+          ? `repeat(${config.columns}, minmax(0, 1fr))`
+          : `repeat(auto-fill, minmax(${config.columnWidth}px, 1fr))`,
+        gap: `${config.gap}px`,
+        width: "100%",
+      };
+    };
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = entry.contentRect.width;
+        setGridStyle(computeGridStyle(width));
+      }
+    });
+
+    resizeObserver.observe(container);
+    setGridStyle(computeGridStyle(container.getBoundingClientRect().width));
+
+    return () => resizeObserver.disconnect();
+  }, [columnWidth, gap, columns, breakpoints]);
+
   const hoverStyle: CSSProperties = scaleOnHover
     ? {
         transition: "transform 0.3s ease, filter 0.3s ease",
@@ -118,16 +176,42 @@ const Masonry: React.FC<MasonryProps> = ({
     }
   };
 
-  return (
-    <div
-      ref={containerRef}
-      className="masonry-container"
-      style={{
+  const computedStyles = useMemo(() => {
+    if (!breakpoints) {
+      return {
         display: "grid",
         gridTemplateColumns: `repeat(auto-fill, minmax(${columnWidth}px, 1fr))`,
         gap: `${gap}px`,
         width: "100%",
-      }}
+      } satisfies CSSProperties;
+    }
+
+    const sortedBreakpoints = Object.entries(breakpoints)
+      .map(([width, values]) => ({ width: Number(width), values }))
+      .sort((a, b) => a.width - b.width);
+
+    return sortedBreakpoints.reduce((acc, { width, values }) => {
+      const minWidth = `${width}px`;
+      const colWidth = values.columnWidth ?? columnWidth;
+      const bpGap = values.gap ?? gap;
+      acc[`@media (min-width: ${minWidth})`] = {
+        gridTemplateColumns: `repeat(auto-fill, minmax(${colWidth}px, 1fr))`,
+        gap: `${bpGap}px`,
+      } as CSSProperties;
+      return acc;
+    }, {
+      display: "grid",
+      gridTemplateColumns: `repeat(auto-fill, minmax(${columnWidth}px, 1fr))`,
+      gap: `${gap}px`,
+      width: "100%",
+    } as CSSProperties);
+  }, [breakpoints, columnWidth, gap]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="masonry-container"
+      style={gridStyle}
     >
       {items.map((item, index) => (
         <div

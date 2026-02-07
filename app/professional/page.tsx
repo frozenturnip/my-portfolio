@@ -43,7 +43,7 @@ function PublicationButtons() {
         href="/publications/Article.pdf"
         target="_blank"
         rel="noopener noreferrer"
-        className="doc-button px-5 py-2 text-sm font-semibold rounded-lg border-2 border-solid transition-all duration-300"
+        className="doc-button w-full sm:w-auto text-center px-5 py-2 text-sm font-semibold rounded-lg border-2 border-solid transition-all duration-300"
         onMouseEnter={handleHover}
         onMouseLeave={handleLeave}
       >
@@ -55,7 +55,7 @@ function PublicationButtons() {
         href="/publications/Manuscript.pdf"
         target="_blank"
         rel="noopener noreferrer"
-        className="doc-button px-5 py-2 text-sm font-semibold rounded-lg border-2 border-solid transition-all duration-300"
+        className="doc-button w-full sm:w-auto text-center px-5 py-2 text-sm font-semibold rounded-lg border-2 border-solid transition-all duration-300"
         onMouseEnter={handleHover}
         onMouseLeave={handleLeave}
       >
@@ -84,6 +84,7 @@ const IndustryGrid = ({
 }) => {
   const [maxHeight, setMaxHeight] = useState<number>(0);
   const wrappers = useRef<Array<HTMLDivElement | null>>([]);
+  const [isDesktop, setIsDesktop] = useState(false);
 
 useEffect(() => {
   const updateHeights = () => {
@@ -113,7 +114,11 @@ useEffect(() => {
       });
 
       const tallest = Math.max(...heights);
-      if (tallest > 0) setMaxHeight(tallest);
+      if (tallest > 0) {
+        const desktopHeight = Math.min(tallest + 20, 440);
+        const mobileHeight = Math.min(Math.max(tallest, 300), 360);
+        setMaxHeight(isDesktop ? desktopHeight : mobileHeight);
+      }
     });
   };
 
@@ -121,10 +126,30 @@ useEffect(() => {
   window.addEventListener("resize", updateHeights);
 
   return () => window.removeEventListener("resize", updateHeights);
-}, [roles.length]);
+}, [roles.length, isDesktop]);
+
+useEffect(() => {
+  const mediaQuery = window.matchMedia("(min-width: 768px)");
+  const handleChange = () => setIsDesktop(mediaQuery.matches);
+  handleChange();
+
+  if (typeof mediaQuery.addEventListener === "function") {
+    mediaQuery.addEventListener("change", handleChange);
+  } else {
+    mediaQuery.addListener(handleChange);
+  }
+
+  return () => {
+    if (typeof mediaQuery.removeEventListener === "function") {
+      mediaQuery.removeEventListener("change", handleChange);
+    } else {
+      mediaQuery.removeListener(handleChange);
+    }
+  };
+}, []);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
       {roles.map((role, i) => (
         <div
           key={i}
@@ -134,7 +159,7 @@ useEffect(() => {
 
 style={{
   height: maxHeight ? `${maxHeight}px` : "auto",
-  minHeight: "375px",
+  minHeight: isDesktop ? "340px" : "300px",
 }}
           className={`flip-card ${flipped === i ? "flipped" : ""}`}
           onClick={(e) => {
@@ -144,19 +169,19 @@ style={{
         >
           <div className="flip-inner">
             {/* FRONT SIDE */}
-            <div className="flip-front bg-white border-2 border-neutral-300 flex flex-col items-center text-center p-6 pt-12">
+            <div className="flip-front bg-white border-2 border-neutral-300 flex h-full flex-col items-center justify-between text-center p-6 sm:p-8 pt-28 sm:pt-32 pb-10 gap-6">
               {/* Medtronic Logo */}
-              <div className="absolute top-8 w-64 h-25 rounded-lg border-4 border-white bg-white flex items-center justify-center overflow-hidden">
+              <div className="absolute top-6 sm:top-8 w-48 sm:w-56 lg:w-64 h-20 sm:h-24 rounded-lg border-4 border-white bg-white flex items-center justify-center overflow-hidden">
                 <Image
                   src="/images/logos/medtronic-logo.JPG"
                   alt="Medtronic logo"
                   fill
-                  className="object-contain px-2"
+                  className="object-contain px-2 sm:px-3"
                   priority
                 />
               </div>
 
-              <div className="mt-32 flex flex-col items-center">
+              <div className="flex flex-col items-center gap-4">
                 <h3
                   className={`text-2xl font-semibold ${
                     role.color === "blue"
@@ -168,20 +193,20 @@ style={{
                 >
                   {role.title}
                 </h3>
-               <p className="mt-4 text-lg font-medium italic text-neutral-800">
+               <p className="mt-4 text-base sm:text-lg font-medium italic text-neutral-800">
                   {role.date}
                 </p>
-<p className="mt-6 text-base text-neutral-700">
-                  Click to view details →
-                </p>
               </div>
+              <p className="text-sm sm:text-base text-neutral-700">
+                Tap to view details →
+              </p>
             </div>
 
             {/* BACK SIDE */}
             <div
               className={`
-    absolute inset-0 rounded-xl p-8 shadow-xl backface-hidden rotate-y-180 
-    flex flex-col border-2 bg-white overflow-hidden
+    absolute inset-0 rounded-xl p-6 sm:p-8 shadow-xl backface-hidden rotate-y-180 
+    flex flex-col border-2 bg-white overflow-y-auto md:overflow-hidden
     ${
       role.color === "blue"
         ? "border-blue-500"
@@ -194,7 +219,7 @@ style={{
   `}
             >
               <h4
-                className={`text-xl font-semibold mb-4 ${
+                className={`text-lg sm:text-xl font-semibold mb-4 ${
                   role.color === "blue"
                     ? "text-blue-700 dark:text-blue-300"
                     : role.color === "purple"
@@ -204,13 +229,13 @@ style={{
               >
                 Key Contributions
               </h4>
-              <ul className="list-disc list-inside space-y-2 text-neutral-900 leading-relaxed wrap-break-word">
+              <ul className="list-disc list-inside space-y-1.5 text-neutral-900 leading-relaxed wrap-break-word text-sm sm:text-base">
                 {role.points.map((point, j) => (
                   <li key={j} className="wrap-break-word">{point}</li>
                 ))}
               </ul>
-              <div className="flex-1 flex items-center">
-                <span className="text-sm italic text-neutral-700">
+              <div className="flex-1 flex items-end justify-center pt-6">
+                <span className="text-xs sm:text-sm italic text-neutral-700">
                   ← Click anywhere to flip back
                 </span>
               </div>
@@ -277,6 +302,7 @@ export default function ProfessionalPage() {
   ];
 const [researchMaxHeight, setResearchMaxHeight] = useState<number>(0);
 const researchWrappers = useRef<Array<HTMLDivElement | null>>([]);
+const [isResearchDesktop, setIsResearchDesktop] = useState(false);
 
 useEffect(() => {
   const updateHeights = () => {
@@ -306,14 +332,38 @@ useEffect(() => {
       });
 
       const tallest = Math.max(...heights);
-      if (tallest > 0) setResearchMaxHeight(tallest);
+      if (tallest > 0) {
+        const desktopHeight = Math.min(tallest + 60, 580);
+        const mobileHeight = Math.min(Math.max(tallest, 360), 460);
+        setResearchMaxHeight(isResearchDesktop ? desktopHeight : mobileHeight);
+      }
     });
   };
 
   updateHeights();
   window.addEventListener("resize", updateHeights);
   return () => window.removeEventListener("resize", updateHeights);
-}, [roles.length]);
+}, [roles.length, isResearchDesktop]);
+
+useEffect(() => {
+  const mediaQuery = window.matchMedia("(min-width: 768px)");
+  const handleChange = () => setIsResearchDesktop(mediaQuery.matches);
+  handleChange();
+
+  if (typeof mediaQuery.addEventListener === "function") {
+    mediaQuery.addEventListener("change", handleChange);
+  } else {
+    mediaQuery.addListener(handleChange);
+  }
+
+  return () => {
+    if (typeof mediaQuery.removeEventListener === "function") {
+      mediaQuery.removeEventListener("change", handleChange);
+    } else {
+      mediaQuery.removeListener(handleChange);
+    }
+  };
+}, []);
   return (
     <section className="py-8 w-full flex flex-col gap-10 bg-background dark:bg-darkbg transition-colors duration-500">
       {/* ===== HERO ===== */}
@@ -326,6 +376,7 @@ useEffect(() => {
             hoverSpeed={0.6}
             darkOpacity={40}
           />
+
           <div className="relative z-10 px-6 max-w-4xl mx-auto text-center flex flex-col items-center">
             <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
               <span className="relative flex h-2 w-2">
@@ -369,16 +420,16 @@ useEffect(() => {
       {/* ===== INDUSTRY EXPERIENCE ===== */}
       <section
         ref={containerRef}
-        className="w-full max-w-[1600px] mx-auto px-12 py-5 space-y-24"
+        className="w-full max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12 py-5 space-y-16 sm:space-y-20 lg:space-y-24"
       >
         <motion.div
-  className="space-y-12 px-12 py-24"
+  className="space-y-8 sm:space-y-10 lg:space-y-12 px-4 sm:px-6 lg:px-12 py-16 sm:py-20 lg:py-24"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <h2
-            className="text-6xl font-extrabold text-center mb-8 tracking-wide"
+            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-center mb-8 tracking-wide"
             style={{ color: "#1d4732" }}
           >
             Industry Experience
@@ -390,22 +441,22 @@ useEffect(() => {
  {/* ===== RESEARCH EXPERIENCE ===== */}
 <section
   ref={researchRef}
-  className="w-full max-w-[1400px] mx-auto px-12 py-5 space-y-16"
+  className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 py-5 space-y-12 sm:space-y-14 lg:space-y-16"
 >
   <motion.div
-    className="space-y-12"
+    className="space-y-8 sm:space-y-10 lg:space-y-12"
     initial={{ opacity: 0, y: 40 }}
     whileInView={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.8, delay: 0.2 }}
   >
     <h2
-      className="text-6xl font-extrabold text-center mb-8 tracking-wide"
+      className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-center mb-8 tracking-wide"
       style={{ color: "#1d4732" }}
     >
       Research Experience
     </h2>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
       {[
         {
           title:
@@ -420,12 +471,12 @@ useEffect(() => {
         },
         {
           title:
-            "Research Fellow — USC Advanced Composites Design Lab",
+            "Research Fellow & Team Lead — USC Advanced Composites Design Lab",
           date: "July 2025 – Present · Los Angeles, CA",
           color: "red",
           points: [
             "Design, fabricate, and test high-performance composite structures, including a glass fiber beam that achieved 6713 lbf ultimate load and a 2581 strength-to-weight ratio for the SAMPE 2026 Student Bridge Contest",
-            "Support lab operations as Team Lead, training and mentoring new members on composite manufacturing techniques, testing procedures, and design workflows",,
+            "Support lab operations as Team Lead, training and mentoring new members on composite manufacturing techniques, testing procedures, and design workflows",
             "Contribute to advanced layup methods, vacuum infusion optimization, and additive manufacturing workflows. Conduct structural optimization and layup design to improve fiber alignment, resin flow, and fiber volume fraction for enhanced stiffness and failure resistance.",
           ],
         },
@@ -437,7 +488,7 @@ useEffect(() => {
   }}
 style={{
   height: researchMaxHeight ? `${researchMaxHeight}px` : "auto",
-  minHeight: "480px",
+  minHeight: isResearchDesktop ? "400px" : "360px",
 }}
   className="relative cursor-pointer perspective-[1000px]"
   onClick={(e) => {
@@ -451,22 +502,22 @@ style={{
             }`}
           >
             {/* FRONT SIDE */}
-            <div className="absolute inset-0 bg-white light:bg-neutral-900 border-2 border-neutral-300 light:border-neutral-700 rounded-xl shadow-lg flex flex-col items-center text-center p-6 pt-12 backface-hidden">
+            <div className="absolute inset-0 bg-white light:bg-neutral-900 border-2 border-neutral-300 light:border-neutral-700 rounded-xl shadow-lg flex h-full flex-col items-center justify-between text-center p-6 sm:p-8 pt-28 sm:pt-32 pb-10 gap-6 backface-hidden">
               {/* USC Viterbi Logo */}
-              <div className="absolute top-6 w-94 h-30 rounded-lg border-4 border-white light:border-neutral-800 bg-white flex items-center justify-center overflow-hidden">
+              <div className="absolute top-6 sm:top-8 w-44 sm:w-60 lg:w-72 h-16 sm:h-20 lg:h-24 rounded-lg border-4 border-white light:border-neutral-800 bg-white flex items-center justify-center overflow-hidden">
                 <Image
                   src="/images/logos/viterbi-logo.JPG"
                   alt="USC Viterbi School of Engineering logo"
                   fill
-                  className="object-contain px-2"
+                  className="object-contain px-2 sm:px-3"
                   priority
                 />
               </div>
 
               {/* Title and info */}
-              <div className="mt-32 flex flex-col items-center">
+              <div className="flex flex-col items-center gap-4">
                 <h3
-                  className={`text-2xl font-semibold ${
+                  className={`text-xl sm:text-2xl font-semibold ${
                     role.color === "orange"
                       ? "text-orange-700 dark:text-orange-400"
                       : "text-red-700 dark:text-red-500"
@@ -474,20 +525,20 @@ style={{
                 >
                   {role.title}
                 </h3>
-<p className="mt-4 text-lg font-medium italic text-neutral-800">
+                <p className="text-base sm:text-lg font-medium italic text-neutral-800">
                   {role.date}
                 </p>
-<p className="mt-6 text-base text-neutral-700">
-                  Click to view details →
-                </p>
               </div>
+              <p className="text-sm sm:text-base text-neutral-700">
+                Tap to view details →
+              </p>
             </div>
 
-{/* BACK SIDE */}
+            {/* BACK SIDE */}
             <div
               className={`
-    absolute inset-0 rounded-xl p-8 shadow-xl backface-hidden rotate-y-180 
-    flex flex-col border-2 bg-white overflow-hidden
+    absolute inset-0 rounded-xl p-6 sm:p-8 shadow-xl backface-hidden rotate-y-180 
+    flex flex-col border-2 bg-white overflow-y-auto md:overflow-hidden
     ${
       role.color === "orange"
         ? "border-orange-500"
@@ -499,7 +550,7 @@ style={{
 
 
               <h4
-                className={`text-xl font-semibold mb-4 ${
+                className={`text-lg sm:text-xl font-semibold mb-4 ${
                   role.color === "orange"
                     ? "text-orange-700 dark:text-orange-300"
                     : "text-red-700 dark:text-red-700"
@@ -507,13 +558,13 @@ style={{
               >
                 Key Contributions
               </h4>
-              <ul className="list-disc list-inside space-y-2 text-neutral-900 leading-relaxed wrap-break-word">
+              <ul className="list-disc list-inside space-y-1.5 text-neutral-900 leading-relaxed wrap-break-word text-sm sm:text-base">
                 {role.points.map((point, j) => (
                   <li key={j} className="wrap-break-word">{point}</li>
                 ))}
               </ul>
-              <div className="flex-1 flex items-center">
-                <span className="text-sm italic text-neutral-700">
+              <div className="flex-1 flex items-end justify-center pt-6">
+                <span className="text-xs sm:text-sm italic text-neutral-700">
                   ← Click anywhere to flip back
                 </span>
               </div>
@@ -527,29 +578,29 @@ style={{
 </section>
 
       {/* ===== PUBLICATIONS ===== */}
-      <motion.div
-  className="flex flex-col items-center justify-center py-20 space-y-6 text-center"
+        <motion.div
+      className="flex flex-col items-center justify-center px-4 sm:px-6 py-16 sm:py-20 space-y-6 text-center"
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.4 }}
       >
             <h2
-      className="text-6xl font-extrabold text-center mb-8 tracking-wide"
+      className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-center mb-8 tracking-wide"
       style={{ color: "#1d4732" }}
     >
       Publications
     </h2>
 
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {/* Theophylline Paper */}
-          <div className="p-8 rounded-xl bg-white/90 dark:bg-darkprimary/30 shadow-lg">
-<h3 className="publication-title text-2xl font-semibold mb-4 leading-snug">
+          <div className="p-6 sm:p-8 rounded-xl bg-white/90 dark:bg-darkprimary/30 shadow-lg">
+<h3 className="publication-title text-xl sm:text-2xl font-semibold mb-4 leading-snug">
   A Point-of-Care Device for Theophylline Quantification in Human Milk Using Laser-Induced Graphene Electrodes
 </h3>
-  <p className="text-xl italic text-neutral-800 dark:text-sage mb-6">
+  <p className="text-base sm:text-lg italic text-neutral-800 dark:text-sage mb-6">
     USC Laboratory for Design of Medical and Analytical Devices, 2024.
   </p>
-  <p className="text-lg text-neutral-800 dark:text-sage leading-relaxed tracking-wide">
+  <p className="text-base sm:text-lg text-neutral-800 dark:text-sage leading-relaxed tracking-wide">
     Developed a <strong>rapid electrochemical biosensor</strong> using
     <strong> laser-induced graphene electrodes </strong> for direct <em>theophylline</em> detection in human breast milk,
     achieving <strong>sub-1-minute analysis time</strong>, <strong>6.5 µM detection limit</strong>, and
@@ -561,7 +612,7 @@ style={{
 
 {/* === PUBLICATION BUTTONS (Reactive with Theme Switch) === */}
 <motion.div
-  className="flex justify-center gap-6 -mt-4"
+  className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 -mt-4"
   initial={{ opacity: 0, y: 10 }}
   whileInView={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.6 }}
@@ -570,14 +621,14 @@ style={{
 </motion.div>
 
           {/* Glucose Paper */}
-          <div className="p-8 rounded-xl bg-white/90 dark:bg-darkprimary/30 shadow-lg">
-<h3 className="publication-title text-2xl font-semibold mb-4 leading-snug">
+          <div className="p-6 sm:p-8 rounded-xl bg-white/90 dark:bg-darkprimary/30 shadow-lg">
+<h3 className="publication-title text-xl sm:text-2xl font-semibold mb-4 leading-snug">
   Mom and Baby Wellness with a Smart Lactation Pad: A Wearable Sensor-Embedded Lactation Pad for On-Body Quantification of Glucose in Breast Milk
 </h3>
-  <p className="text-xl italic text-neutral-800 dark:text-sage mb-6">
+  <p className="text-base sm:text-lg italic text-neutral-800 dark:text-sage mb-6">
     USC Laboratory for Design of Medical and Analytical Devices, 2024.
   </p>
-  <p className="text-lg text-neutral-800 dark:text-sage leading-relaxed tracking-wide">
+  <p className="text-base sm:text-lg text-neutral-800 dark:text-sage leading-relaxed tracking-wide">
     Designed the first <strong>wearable lactation pad</strong> integrating <strong>microfluidic channels </strong> 
     and <strong>enzymatic electrochemical sensors</strong> for on-body <em>glucose</em> quantification in undiluted human milk. 
     Achieved <strong>96.8–104.1 % recovery accuracy</strong> across postpartum stages, establishing a new <strong>biosensing platform</strong> for <strong>maternal and infant wellness monitoring</strong>.
@@ -585,7 +636,7 @@ style={{
 </div>
 {/* Button for Mom & Baby Published Article */}
 <motion.div
-  className="flex justify-center gap-6 mt-4 mb-10"
+  className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-6 sm:mt-4 mb-8 sm:mb-10"
   initial={{ opacity: 0, y: 10 }}
   whileInView={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.6 }}
@@ -594,7 +645,7 @@ style={{
     href="/publications/Mom_Baby_Article.pdf"
     target="_blank"
     rel="noopener noreferrer"
-    className="doc-button px-5 py-2 text-sm font-semibold rounded-lg border-2 border-solid transition-all duration-300"
+    className="doc-button w-full sm:w-auto text-center px-5 py-2 text-sm font-semibold rounded-lg border-2 border-solid transition-all duration-300"
     onMouseEnter={(e) => {
       e.currentTarget.style.borderColor = "#f5c76a";
       e.currentTarget.style.color = "#f5c76a";
@@ -613,19 +664,19 @@ style={{
 
       {/* ===== VIEW MY DOCUMENTS ===== */}
 <motion.div
-  className="flex flex-col items-center justify-center py-5 space-y-6 text-center"
+        className="flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-10 space-y-6 text-center"
   initial={{ opacity: 0, y: 40 }}
   whileInView={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.8, delay: 0.2 }}
   viewport={{ once: true }}
 >
  <h2
-      className="text-6xl font-extrabold text-center mb-8 tracking-wide"
+            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-center mb-8 tracking-wide"
       style={{ color: "#1d4732" }}
     >
       My Documents
     </h2>
-  <div className="flex flex-wrap justify-center gap-6">
+        <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-6">
     {/* View CV Button */}
     <motion.a
       href="/cv_resume/Alessandro_Tasso_CV.pdf"
@@ -638,7 +689,7 @@ style={{
       }}
       whileTap={{ scale: 0.95 }}
       transition={{ type: "spring", stiffness: 250, damping: 15 }}
-      className="px-6 py-3 text-md font-semibold border-2 border-green-600 rounded-xl hover:shadow-lg transition-all duration-300"
+      className="w-full sm:w-auto text-center px-6 py-3 text-sm sm:text-base font-semibold border-2 border-green-600 rounded-xl hover:shadow-lg transition-all duration-300"
     >
       View CV
     </motion.a>
@@ -655,7 +706,7 @@ style={{
       }}
       whileTap={{ scale: 0.95 }}
       transition={{ type: "spring", stiffness: 250, damping: 15 }}
-      className="px-6 py-3 text-md font-semibold border-2 border-blue-600 rounded-xl hover:shadow-lg transition-all duration-300"
+      className="w-full sm:w-auto text-center px-6 py-3 text-sm sm:text-base font-semibold border-2 border-blue-600 rounded-xl hover:shadow-lg transition-all duration-300"
     >
       View Resume
     </motion.a>

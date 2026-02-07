@@ -4,7 +4,6 @@ import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import DotGrid from "./components/DotGrid";
 import { ParticleCard, MagicBentoStyles } from "./components/MagicBentoEffects";
 
 // Animation variants
@@ -113,23 +112,6 @@ export default function HomePage() {
   return (
     <>
       <MagicBentoStyles glowColor={glowColor} />
-      
-      {/* Background DotGrid - starts below header */}
-      <div className="fixed top-[28px] left-0 right-0 bottom-0 -z-10 opacity-30 dark:opacity-20">
-        {mounted && (
-          <DotGrid
-            dotSize={3}
-            gap={40}
-            baseColor={isDark ? "#ffffff" : "#1d4732"}
-            activeColor={isDark ? "#f5c76a" : "#f5c76a"}
-            proximity={120}
-            speedTrigger={80}
-            shockRadius={200}
-            shockStrength={3}
-          />
-        )}
-      </div>
-
       <motion.section
         className="min-h-[calc(100vh-120px)] flex flex-col justify-center space-y-16 pt-8 pb-16"
         variants={containerVariants}

@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useEffect, FormEvent } from "react";
-import DotGrid from "../components/DotGrid";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 
@@ -38,18 +37,7 @@ export default function SecretLogin() {
     <div className="dark min-h-screen w-full">
       {createPortal(
         <div style={{ position: "fixed", top: "45px", left: 0, right: 0, bottom: 0, zIndex: 0, pointerEvents: "none" }}>
-          <DotGrid
-            dotSize={10}
-            gap={15}
-            baseColor="#5227FF"
-            activeColor="#5227FF"
-            proximity={120}
-            shockRadius={250}
-            shockStrength={5}
-            resistance={750}
-            returnDuration={1.5}
-            className="w-full h-full"
-          />
+            {/* Background effect removed per request */}
         </div>,
         document.body
       )}

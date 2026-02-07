@@ -129,6 +129,10 @@ header nav a:hover {
 .dark .publication-title {
   color: #1d1d1d !important;
 }
+
+.hyphens-manual {
+  hyphens: manual;
+}
 /* ===== Publication buttons dark-mode styling ===== */
 .publication-button {
   transition: all 0.3s ease-in-out;
